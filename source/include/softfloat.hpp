@@ -184,4 +184,6 @@ bool f128M_eq_signaling( const float128_t *, const float128_t * );
 bool f128M_le_quiet( const float128_t *, const float128_t * );
 bool f128M_lt_quiet( const float128_t *, const float128_t * );
 bool f128M_isSignalingNaN( const float128_t * );
+
+extern bool softfloat_isNaNF128M( const uint32_t* );
 };
