@@ -319,12 +319,7 @@ list( APPEND softfloat_sources ${softfloat_headers} )
 add_library ( softfloat STATIC ${softfloat_sources} )
 target_include_directories( softfloat PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/source/include" "${CMAKE_CURRENT_SOURCE_DIR}/source/8086-SSE" "${CMAKE_CURRENT_SOURCE_DIR}/build/Linux-x86_64-GCC" )
 
-install ( TARGETS
-   softfloat
-
-   RUNTIME DESTINATION bin
-   LIBRARY DESTINATION lib
-   ARCHIVE DESTINATION lib
-)
-
-#install ( FILES ${HEADERS} DESTINATION "include/" )
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/source/include DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR}/eosio/softfloat)
+install(TARGETS softfloat
+   LIBRARY DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR} 
+   ARCHIVE DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR})
