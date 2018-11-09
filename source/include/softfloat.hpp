@@ -186,3 +186,75 @@ bool f128M_lt_quiet( const float128_t *, const float128_t * );
 bool f128M_isSignalingNaN( const float128_t * );
 bool isNaNF128( const float128_t * );
 };
+
+inline bool operator == (const float32_t& lhs, const float32_t& rhs) {
+   return f32_eq(lhs, rhs);
+}
+
+inline bool operator != (const float32_t& lhs, const float32_t& rhs) {
+   return !f32_eq(lhs, rhs);
+}
+
+inline bool operator < (const float32_t& lhs, const float32_t& rhs) {
+   return f32_lt(lhs, rhs);
+}
+
+inline bool operator > (const float32_t& lhs, const float32_t& rhs) {
+   return f32_lt(rhs, lhs);
+}
+
+inline bool operator <= (const float32_t& lhs, const float32_t& rhs) {
+   return f32_le(lhs, rhs);
+}
+
+inline bool operator >= (const float32_t& lhs, const float32_t& rhs) {
+   return f32_le(rhs, lhs);
+}
+
+inline bool operator == (const float64_t& lhs, const float64_t& rhs) {
+   return f64_eq(lhs, rhs);
+}
+
+inline bool operator != (const float64_t& lhs, const float64_t& rhs) {
+   return !f64_eq(lhs, rhs);
+}
+
+inline bool operator < (const float64_t& lhs, const float64_t& rhs) {
+   return f64_lt(lhs, rhs);
+}
+
+inline bool operator > (const float64_t& lhs, const float64_t& rhs) {
+   return f64_lt(rhs, lhs);
+}
+
+inline bool operator <= (const float64_t& lhs, const float64_t& rhs) {
+   return f64_le(lhs, rhs);
+}
+
+inline bool operator >= (const float64_t& lhs, const float64_t& rhs) {
+   return f64_le(rhs, lhs);
+}
+
+inline bool operator == (const float128_t& lhs, const float128_t& rhs) {
+   return f128_eq(lhs, rhs);
+}
+
+inline bool operator != (const float128_t& lhs, const float128_t& rhs) {
+   return !f128_eq(lhs, rhs);
+}
+
+inline bool operator < (const float128_t& lhs, const float128_t& rhs) {
+   return f128_lt(lhs, rhs);
+}
+
+inline bool operator > (const float128_t& lhs, const float128_t& rhs) {
+   return f128_lt(rhs, lhs);
+}
+
+inline bool operator <= (const float128_t& lhs, const float128_t& rhs) {
+   return f128_le(lhs, rhs);
+}
+
+inline bool operator >= (const float128_t& lhs, const float128_t& rhs) {
+   return f128_le(rhs, lhs);
+}
