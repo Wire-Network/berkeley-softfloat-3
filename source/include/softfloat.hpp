@@ -280,10 +280,10 @@ inline float32_t f32_positive_infinity() {
    return {0x7f800000ul};
 }
 inline float64_t f64_negative_infinity() {
-   return {0xff00000000000000ull};
+   return {0xfff0000000000000ull};
 }
 inline float64_t f64_positive_infinity() {
-   return {0x7f00000000000000ull};
+   return {0x7ff0000000000000ull};
 }
 inline float128_t f128_negative_infinity() {
    return {{0x0ull, 0xffff000000000000ull}};
