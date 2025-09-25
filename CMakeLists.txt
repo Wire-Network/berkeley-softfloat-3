@@ -5,8 +5,8 @@ project(SoftFloat)
 set(CMAKE_EXPORT_COMPILE_COMMANDS "ON")
 
 message(STATUS "Configuring SoftFloat")
-set(C_DEFINES "-DSOFTFLOAT_FAST_INT64 -DSOFTFLOAT_ROUND_EVEN -DINLINE_LEVEL=5 -DSOFTFLOAT_FAST_DIV32TO16 -DSOFTFLOAT_FAST_DIV64TO32")
-set(CMAKE_C_FLAGS " -Wall -Werror-implicit-function-declaration -Wno-conversion ${CMAKE_C_FLAGS} ${C_DEFINES}")
+
+
 set(softfloat_sources
    source/s_eq128.c
    source/s_le128.c
@@ -311,7 +311,13 @@ set(softfloat_sources
    source/f128M_le_quiet.c
    source/f128M_lt_quiet.c
 )
+set(IS_WASM OFF)
 set(IS_ARM OFF)
+
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "wasm32|wasm64|wasm")
+   set(IS_WASM ON)
+   message(STATUS "Configuring for WebAssembly")
+endif()
 
 if(LINUX AND CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64|AMD64|amd64|x64")
    message(STATUS "Configuring for x86_64")
@@ -346,6 +352,30 @@ list(APPEND softfloat_sources ${softfloat_headers})
 add_library(softfloat STATIC ${softfloat_sources})
 
 # CONFIGURE TARGET
+target_compile_options(
+   softfloat
+   PRIVATE
+   -Wall
+   -Wno-conversion
+   -DSOFTFLOAT_FAST_INT64
+   -DSOFTFLOAT_ROUND_EVEN
+   -DINLINE_LEVEL=5
+   -DSOFTFLOAT_FAST_DIV32TO16
+   -DSOFTFLOAT_FAST_DIV64TO32
+   -Wno-everything 
+)
+
+# WASM SPECIFIC FLAGS
+if(IS_WASM)
+   target_compile_options(
+      softfloat
+      PRIVATE
+      -Werror-implicit-function-declaration
+      -allow-sse
+   )
+endif()
+
+
 if(NOT IS_ARM)
    target_include_directories(
       softfloat
