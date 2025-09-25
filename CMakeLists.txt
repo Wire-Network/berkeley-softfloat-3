@@ -6,7 +6,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS "ON")
 
 message(STATUS "Configuring SoftFloat")
 
-
 set(softfloat_sources
    source/s_eq128.c
    source/s_le128.c
@@ -340,10 +339,13 @@ else()
    message(FATAL_ERROR "Unsupported architecture: ${CMAKE_SYSTEM_PROCESSOR}")
 endif()
 
+message(NOTICE "SYSTEM PROCESSOR: ${CMAKE_SYSTEM_PROCESSOR}, IS_WASM: ${IS_WASM}, IS_ARM: ${IS_ARM}")
+
 # CONFIGURE FILES
 file(GLOB softfloat_headers "${CMAKE_CURRENT_SOURCE_DIR}/source/include/*.h"
-   "${CMAKE_CURRENT_SOURCE_DIR}/build/Linux-x86_64-GCC/platform.h"
-   "${CMAKE_CURRENT_SOURCE_DIR}/source/8086-SSE/specialize.h")
+   # "${CMAKE_CURRENT_SOURCE_DIR}/build/Linux-x86_64-GCC/platform.h"
+   # "${CMAKE_CURRENT_SOURCE_DIR}/source/8086-SSE/specialize.h"
+   )
 
 list(APPEND softfloat_headers ${softfloat_arch_headers})
 list(APPEND softfloat_sources ${softfloat_headers})
@@ -357,13 +359,17 @@ target_compile_options(
    PRIVATE
    -Wall
    -Wno-conversion
-   -DSOFTFLOAT_FAST_INT64
-   -DSOFTFLOAT_ROUND_EVEN
-   -DINLINE_LEVEL=5
-   -DSOFTFLOAT_FAST_DIV32TO16
-   -DSOFTFLOAT_FAST_DIV64TO32
    -Wno-everything 
 )
+
+target_compile_definitions(
+   softfloat
+   PUBLIC
+   SOFTFLOAT_FAST_INT64
+   SOFTFLOAT_ROUND_EVEN
+   INLINE_LEVEL=5
+   SOFTFLOAT_FAST_DIV32TO16
+   SOFTFLOAT_FAST_DIV64TO32)
 
 # WASM SPECIFIC FLAGS
 if(IS_WASM)
@@ -394,11 +400,8 @@ else()
    )
 endif()
 
-if(SOFTFLOAT_INSTALL_COMPONENT)
-   set(INSTALL_COMPONENT_ARGS COMPONENT ${SOFTFLOAT_INSTALL_COMPONENT} EXCLUDE_FROM_ALL)
-endif()
 
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/source/include/ DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR}/softfloat ${INSTALL_COMPONENT_ARGS})
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/source/include/ DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR}/softfloat )
 install(TARGETS softfloat
-   LIBRARY DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR} ${INSTALL_COMPONENT_ARGS}
-   ARCHIVE DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR} ${INSTALL_COMPONENT_ARGS})
+   LIBRARY DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR} 
+   ARCHIVE DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR} )
