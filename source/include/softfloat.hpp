@@ -1,7 +1,6 @@
 #pragma once
 
 #include <softfloat_types.h>
-#include <memory>
 
 #ifndef THREAD_LOCAL
 #define THREAD_LOCAL __thread
@@ -295,21 +294,21 @@ inline float128_t f128_positive_infinity() {
 
 inline float32_t to_softfloat32( float f ) {
    float32_t x;
-   std::memcpy(&x, &f, sizeof(f));
+   memcpy(&x, &f, sizeof(f));
    return x;
 }
 inline float64_t to_softfloat64( double d ) {
    float64_t x;
-   std::memcpy(&x, &d, sizeof(d));
+   memcpy(&x, &d, sizeof(d));
    return x;
 }
 inline float from_softfloat32( float32_t f ) {
    float x;
-   std::memcpy(&x, &f, sizeof(f));
+   memcpy(&x, &f, sizeof(f));
    return x;
 }
 inline double from_softfloat64( float64_t d ) {
    double x;
-   std::memcpy(&x, &d, sizeof(d));
+   memcpy(&x, &d, sizeof(d));
    return x;
 }

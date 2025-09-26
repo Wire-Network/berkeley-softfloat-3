@@ -1,3 +1,6 @@
-build/*/*.o
-build/*/*.a
-build/target
+/.vscode
+/local*.js
+/build/*/*.o
+/build/*/*.a
+/build/target
+/target
