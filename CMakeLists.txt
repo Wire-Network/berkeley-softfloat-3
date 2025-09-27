@@ -407,10 +407,10 @@ set(softfloat_sources
 file(
    GLOB
    softfloat_headers
-   source/include/*.h
-   source/include/*.hpp
-   "build/${ARCH_BUILD_TYPE}/platform.h"
-   "source/${ARCH_SOURCE_TYPE}/specialize.h"
+   # source/include/softfloat/*.h
+   # source/include/softfloat/*.hpp
+   "build/${ARCH_BUILD_TYPE}/softfloat/platform.h"
+   "source/${ARCH_SOURCE_TYPE}/softfloat/specialize.h"
 )
 
 
@@ -429,19 +429,9 @@ if(SOFTFLOAT_LEGACY_COMPAT)
    )
 endif()
 
-# CONFIGURE TARGET
-# target_compile_options(
-#    softfloat
-#    PRIVATE
-#    -Wall
-#    -Wno-conversion
-#    -Wno-everything 
-# )
-
 target_compile_definitions(
    softfloat
    PUBLIC
-   # "-DSOFTFLOAT_FAST_INT64 -DSOFTFLOAT_ROUND_EVEN -DINLINE_LEVEL=5 -DSOFTFLOAT_FAST_DIV32TO16 -DSOFTFLOAT_FAST_DIV64TO32"
    -DSOFTFLOAT_FAST_INT64
    -DSOFTFLOAT_ROUND_EVEN
    -DINLINE_LEVEL=5
@@ -463,27 +453,37 @@ endif()
 target_include_directories(
    softfloat
    PRIVATE
-   source/include
+   
    source/${ARCH_SOURCE_TYPE}
    build/${ARCH_BUILD_TYPE}
 )
 
+target_include_directories(
+   softfloat
+   PUBLIC
+   $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/source/include> 
+   $<INSTALL_INTERFACE:include>
+   # source/include
+)
+
 if(NOT SOFTFLOAT_SKIP_INSTALL)
 
+   install(FILES ${softfloat_headers} DESTINATION include/softfloat)
+   install(DIRECTORY source/include/  DESTINATION include)
    install(
       TARGETS softfloat
       EXPORT softfloat-config
       RUNTIME DESTINATION bin
       ARCHIVE DESTINATION lib
       LIBRARY DESTINATION lib
-      PUBLIC_HEADER DESTINATION include/softfloat
+      INCLUDES DESTINATION include
+      PUBLIC_HEADER DESTINATION include
    )
-
-   install(FILES ${softfloat_headers} DESTINATION include/softfloat)
 
    install(
       EXPORT softfloat-config
       FILE softfloat-config.cmake
+      
       NAMESPACE softfloat::
       DESTINATION share/softfloat
    )

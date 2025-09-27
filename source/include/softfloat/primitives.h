@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <stdbool.h>
 #include <stdint.h>
-#include "primitiveTypes.h"
+#include "softfloat/primitiveTypes.h"
 
 #ifndef softfloat_shortShiftRightJam64
 /*----------------------------------------------------------------------------

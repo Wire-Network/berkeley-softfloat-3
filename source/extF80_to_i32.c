@@ -36,10 +36,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <stdbool.h>
 #include <stdint.h>
-#include "platform.h"
-#include "internals.h"
-#include "specialize.h"
-#include "softfloat.h"
+#include "softfloat/platform.h"
+#include "softfloat/internals.h"
+#include "softfloat/specialize.h"
+#include "softfloat/softfloat.h"
 
 int_fast32_t
  extF80_to_i32( extFloat80_t a, uint_fast8_t roundingMode, bool exact )

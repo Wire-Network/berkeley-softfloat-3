@@ -35,10 +35,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =============================================================================*/
 
 #include <stdint.h>
-#include "platform.h"
-#include "primitives.h"
-#include "specialize.h"
-#include "softfloat.h"
+#include "softfloat/platform.h"
+#include "softfloat/primitives.h"
+#include "softfloat/specialize.h"
+#include "softfloat/softfloat.h"
 
 /*----------------------------------------------------------------------------
 | Assuming the 128-bit floating-point value pointed to by `aWPtr' is a NaN,

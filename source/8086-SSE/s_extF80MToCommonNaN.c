@@ -35,10 +35,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =============================================================================*/
 
 #include <stdint.h>
-#include "platform.h"
-#include "internals.h"
-#include "specialize.h"
-#include "softfloat.h"
+#include "softfloat/platform.h"
+#include "softfloat/internals.h"
+#include "softfloat/specialize.h"
+#include "softfloat/softfloat.h"
 
 /*----------------------------------------------------------------------------
 | Assuming the 80-bit extended floating-point value pointed to by `aSPtr' is

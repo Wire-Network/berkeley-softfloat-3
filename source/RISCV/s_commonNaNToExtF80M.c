@@ -34,11 +34,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include "platform.h"
-#include "softfloat_types.h"
+#include "softfloat/platform.h"
+#include "softfloat/softfloat_types.h"
 
 #define softfloat_commonNaNToExtF80M softfloat_commonNaNToExtF80M
-#include "specialize.h"
+#include "softfloat/specialize.h"
 
 /*----------------------------------------------------------------------------
 | Converts the common NaN pointed to by `aPtr' into an 80-bit extended

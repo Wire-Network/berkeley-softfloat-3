@@ -35,8 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =============================================================================*/
 
 #include <stdint.h>
-#include "platform.h"
-#include "primitives.h"
+#include "softfloat/platform.h"
+#include "softfloat/primitives.h"
 
 const uint16_t softfloat_approxRecip_1k0s[16] = {
     0xFFC4, 0xF0BE, 0xE363, 0xD76F, 0xCCAD, 0xC2F0, 0xBA16, 0xB201,

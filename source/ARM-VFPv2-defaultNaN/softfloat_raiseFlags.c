@@ -34,8 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include "platform.h"
-#include "softfloat.h"
+#include "softfloat/platform.h"
+#include "softfloat/softfloat.h"
 
 /*----------------------------------------------------------------------------
 | Raises the exceptions specified by 'flags'.  Floating-point traps can be

@@ -35,8 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =============================================================================*/
 
 #include <stdint.h>
-#include "platform.h"
-#include "primitiveTypes.h"
+#include "softfloat/platform.h"
+#include "softfloat/primitiveTypes.h"
 
 #ifndef softfloat_mul64ByShifted32To128
 

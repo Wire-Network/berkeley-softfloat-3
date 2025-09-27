@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef INLINE
 
 #include <stdint.h>
-#include "primitiveTypes.h"
+#include "softfloat/primitiveTypes.h"
 
 #ifdef SOFTFLOAT_BUILTIN_CLZ
 

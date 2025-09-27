@@ -35,9 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =============================================================================*/
 
 #include <stdint.h>
-#include "platform.h"
-#include "specialize.h"
-#include "softfloat.h"
+#include "softfloat/platform.h"
+#include "softfloat/specialize.h"
+#include "softfloat/softfloat.h"
 
 /*----------------------------------------------------------------------------
 | Interpreting `uiA' and `uiB' as the bit patterns of two 16-bit floating-

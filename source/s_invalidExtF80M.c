@@ -34,9 +34,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#include "platform.h"
-#include "specialize.h"
-#include "softfloat.h"
+#include "softfloat/platform.h"
+#include "softfloat/specialize.h"
+#include "softfloat/softfloat.h"
 
 void softfloat_invalidExtF80M( struct extFloat80M *zSPtr )
 {

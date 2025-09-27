@@ -35,9 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =============================================================================*/
 
 #include <stdint.h>
-#include "platform.h"
-#include "primitives.h"
-#include "specialize.h"
+#include "softfloat/platform.h"
+#include "softfloat/primitives.h"
+#include "softfloat/specialize.h"
 
 /*----------------------------------------------------------------------------
 | Converts the common NaN pointed to by `aPtr' into an 80-bit extended

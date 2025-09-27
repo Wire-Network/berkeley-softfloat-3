@@ -35,11 +35,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =============================================================================*/
 
 #include <stdint.h>
-#include "platform.h"
-#include "primitiveTypes.h"
+#include "softfloat/platform.h"
+#include "softfloat/primitiveTypes.h"
 
 #define softfloat_commonNaNToF128M softfloat_commonNaNToF128M
-#include "specialize.h"
+#include "softfloat/specialize.h"
 
 /*----------------------------------------------------------------------------
 | Converts the common NaN pointed to by 'aPtr' into a 128-bit floating-point

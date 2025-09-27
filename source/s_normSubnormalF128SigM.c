@@ -35,8 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =============================================================================*/
 
 #include <stdint.h>
-#include "platform.h"
-#include "internals.h"
+#include "softfloat/platform.h"
+#include "softfloat/internals.h"
 
 int softfloat_normSubnormalF128SigM( uint32_t *sigPtr )
 {
