@@ -47,10 +47,34 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 | the types below may, if desired, be defined as aliases for the native types
 | (typically 'float' and 'double', and possibly 'long double').
 *----------------------------------------------------------------------------*/
-typedef struct { uint16_t v; } float16_t;
-typedef struct { uint32_t v; } float32_t;
-typedef struct { uint64_t v; } float64_t;
-typedef struct { uint64_t v[2]; } float128_t;
+typedef struct { uint16_t v; } softfloat16_t;
+typedef struct { uint32_t v; } softfloat32_t;
+typedef struct { uint64_t v; } softfloat64_t;
+typedef struct { uint64_t v[2]; } softfloat128_t;
+
+#if defined(__cplusplus)
+static_assert(sizeof(softfloat16_t) == 2, "softfloat16_t must be 16 bits");
+static_assert(sizeof(softfloat32_t) == 4, "softfloat32_t must be 32 bits");
+static_assert(sizeof(softfloat64_t) == 8, "softfloat64_t must be 64 bits");
+static_assert(sizeof(softfloat128_t) == 16, "softfloat128_t must be 128 bits");
+#elif defined(__STDC_VERSION__) && (201112L <= __STDC_VERSION__)
+_Static_assert(sizeof(softfloat16_t) == 2, "softfloat16_t must be 16 bits");
+_Static_assert(sizeof(softfloat32_t) == 4, "softfloat32_t must be 32 bits");
+_Static_assert(sizeof(softfloat64_t) == 8, "softfloat64_t must be 64 bits");
+_Static_assert(sizeof(softfloat128_t) == 16, "softfloat128_t must be 128 bits");
+#endif
+
+/*
+| Legacy aliases remain available by default for source compatibility.  The
+| CMake target disables them for Apple/Linux arm64 consumers, where these names
+| collide with NEON typedefs from platform headers.
+*----------------------------------------------------------------------------*/
+#ifndef SOFTFLOAT_DISABLE_LEGACY_TYPE_ALIASES
+typedef softfloat16_t float16_t;
+typedef softfloat32_t float32_t;
+typedef softfloat64_t float64_t;
+typedef softfloat128_t float128_t;
+#endif
 
 /*----------------------------------------------------------------------------
 | The format of an 80-bit extended floating-point number in memory.  This
@@ -78,4 +102,3 @@ struct extFloat80M { uint16_t signExp; uint64_t signif; };
 typedef struct extFloat80M extFloat80_t;
 
 #endif
-

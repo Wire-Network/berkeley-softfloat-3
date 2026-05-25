@@ -43,7 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef SOFTFLOAT_FAST_INT64
 
 void
- f128M_sub( const float128_t *aPtr, const float128_t *bPtr, float128_t *zPtr )
+ f128M_sub( const softfloat128_t *aPtr, const softfloat128_t *bPtr, softfloat128_t *zPtr )
 {
     const uint64_t *aWPtr, *bWPtr;
     uint_fast64_t uiA64, uiA0;
@@ -51,7 +51,7 @@ void
     uint_fast64_t uiB64, uiB0;
     bool signB;
 #if ! defined INLINE_LEVEL || (INLINE_LEVEL < 2)
-    float128_t
+    softfloat128_t
         (*magsFuncPtr)(
             uint_fast64_t, uint_fast64_t, uint_fast64_t, uint_fast64_t, bool );
 #endif
@@ -81,7 +81,7 @@ void
 #else
 
 void
- f128M_sub( const float128_t *aPtr, const float128_t *bPtr, float128_t *zPtr )
+ f128M_sub( const softfloat128_t *aPtr, const softfloat128_t *bPtr, softfloat128_t *zPtr )
 {
 
     softfloat_addF128M(

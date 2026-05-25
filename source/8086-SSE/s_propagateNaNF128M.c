@@ -57,10 +57,10 @@ void
     const uint32_t *ptr;
 
     ptr = aWPtr;
-    isSigNaNA = f128M_isSignalingNaN( (const float128_t *) aWPtr );
+    isSigNaNA = f128M_isSignalingNaN( (const softfloat128_t *) aWPtr );
     if (
         isSigNaNA
-            || (bWPtr && f128M_isSignalingNaN( (const float128_t *) bWPtr ))
+            || (bWPtr && f128M_isSignalingNaN( (const softfloat128_t *) bWPtr ))
     ) {
         softfloat_raiseFlags( softfloat_flag_invalid );
         if ( isSigNaNA ) goto copy;
