@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 3.10)
+
 # Defines softfloat library
 project (SoftFloat )
 
@@ -7,6 +9,27 @@ set (CMAKE_EXPORT_COMPILE_COMMANDS "ON")
 message ( STATUS "Configuring SoftFloat" )
 set( C_DEFINES "-DSOFTFLOAT_FAST_INT64 -DSOFTFLOAT_ROUND_EVEN -DINLINE_LEVEL=5 -DSOFTFLOAT_FAST_DIV32TO16 -DSOFTFLOAT_FAST_DIV64TO32" )
 set( CMAKE_C_FLAGS " -Wall -Werror-implicit-function-declaration -Wno-conversion ${CMAKE_C_FLAGS} ${C_DEFINES}" )
+
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "wasm|wasm32|wasm64")
+   message(STATUS "Configuring for wasm")
+   set(ARCH_SOURCE_TYPE 8086-SSE)
+   set(ARCH_BUILD_TYPE Linux-x86_64-GCC)
+elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64|AMD64|amd64|x64")
+   message(STATUS "Configuring for x86_64")
+   set(ARCH_SOURCE_TYPE 8086-SSE)
+   set(ARCH_BUILD_TYPE Linux-x86_64-GCC)
+elseif(MSVC AND CMAKE_SYSTEM_PROCESSOR MATCHES "arm64|ARM64|aarch64")
+   message(STATUS "Configuring for Windows ARM64 with generic ARM sources")
+   set(ARCH_SOURCE_TYPE ARM-VFPv2)
+   set(ARCH_BUILD_TYPE template-FAST_INT64)
+elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "arm64|ARM64|aarch64")
+   message(STATUS "Configuring for arm64")
+   set(ARCH_SOURCE_TYPE ARM-VFPv2)
+   set(ARCH_BUILD_TYPE Linux-ARM-VFPv2-GCC)
+else()
+   message(FATAL_ERROR "Unsupported architecture: ${CMAKE_SYSTEM_PROCESSOR}")
+endif()
+
 set ( softfloat_sources
   source/s_eq128.c
   source/s_le128.c
@@ -39,24 +62,24 @@ set ( softfloat_sources
   source/s_approxRecip32_1.c
   source/s_approxRecipSqrt_1Ks.c
   source/s_approxRecipSqrt32_1.c
-  source/8086-SSE/softfloat_raiseFlags.c
-  source/8086-SSE/s_f16UIToCommonNaN.c
-  source/8086-SSE/s_commonNaNToF16UI.c
-  source/8086-SSE/s_propagateNaNF16UI.c
-  source/8086-SSE/s_f32UIToCommonNaN.c
-  source/8086-SSE/s_commonNaNToF32UI.c
-  source/8086-SSE/s_propagateNaNF32UI.c
-  source/8086-SSE/s_f64UIToCommonNaN.c
-  source/8086-SSE/s_commonNaNToF64UI.c
-  source/8086-SSE/s_propagateNaNF64UI.c
-  source/8086-SSE/extF80M_isSignalingNaN.c
-  source/8086-SSE/s_extF80UIToCommonNaN.c
-  source/8086-SSE/s_commonNaNToExtF80UI.c
-  source/8086-SSE/s_propagateNaNExtF80UI.c
-  source/8086-SSE/f128M_isSignalingNaN.c
-  source/8086-SSE/s_f128UIToCommonNaN.c
-  source/8086-SSE/s_commonNaNToF128UI.c
-  source/8086-SSE/s_propagateNaNF128UI.c
+  source/${ARCH_SOURCE_TYPE}/softfloat_raiseFlags.c
+  source/${ARCH_SOURCE_TYPE}/s_f16UIToCommonNaN.c
+  source/${ARCH_SOURCE_TYPE}/s_commonNaNToF16UI.c
+  source/${ARCH_SOURCE_TYPE}/s_propagateNaNF16UI.c
+  source/${ARCH_SOURCE_TYPE}/s_f32UIToCommonNaN.c
+  source/${ARCH_SOURCE_TYPE}/s_commonNaNToF32UI.c
+  source/${ARCH_SOURCE_TYPE}/s_propagateNaNF32UI.c
+  source/${ARCH_SOURCE_TYPE}/s_f64UIToCommonNaN.c
+  source/${ARCH_SOURCE_TYPE}/s_commonNaNToF64UI.c
+  source/${ARCH_SOURCE_TYPE}/s_propagateNaNF64UI.c
+  source/${ARCH_SOURCE_TYPE}/extF80M_isSignalingNaN.c
+  source/${ARCH_SOURCE_TYPE}/s_extF80UIToCommonNaN.c
+  source/${ARCH_SOURCE_TYPE}/s_commonNaNToExtF80UI.c
+  source/${ARCH_SOURCE_TYPE}/s_propagateNaNExtF80UI.c
+  source/${ARCH_SOURCE_TYPE}/f128M_isSignalingNaN.c
+  source/${ARCH_SOURCE_TYPE}/s_f128UIToCommonNaN.c
+  source/${ARCH_SOURCE_TYPE}/s_commonNaNToF128UI.c
+  source/${ARCH_SOURCE_TYPE}/s_propagateNaNF128UI.c
   source/s_roundToUI32.c
   source/s_roundToUI64.c
   source/s_roundToI32.c
@@ -313,11 +336,41 @@ set ( softfloat_sources
 )
 
 file ( GLOB softfloat_headers "${CMAKE_CURRENT_SOURCE_DIR}/source/include/*.h"
-                              "${CMAKE_CURRENT_SOURCE_DIR}/build/Linux-x86_64-GCC/platform.h"
-                              "${CMAKE_CURRENT_SOURCE_DIR}/source/8086-SSE/specialize.h" )
+                              "${CMAKE_CURRENT_SOURCE_DIR}/build/${ARCH_BUILD_TYPE}/platform.h"
+                              "${CMAKE_CURRENT_SOURCE_DIR}/source/${ARCH_SOURCE_TYPE}/specialize.h" )
 list( APPEND softfloat_sources ${softfloat_headers} )
 add_library ( softfloat STATIC ${softfloat_sources} )
-target_include_directories( softfloat PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/source/include" "${CMAKE_CURRENT_SOURCE_DIR}/source/8086-SSE" "${CMAKE_CURRENT_SOURCE_DIR}/build/Linux-x86_64-GCC" )
+target_include_directories( softfloat PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/source/include" "${CMAKE_CURRENT_SOURCE_DIR}/source/${ARCH_SOURCE_TYPE}" "${CMAKE_CURRENT_SOURCE_DIR}/build/${ARCH_BUILD_TYPE}" )
+target_compile_options(softfloat PRIVATE
+   $<$<COMPILE_LANG_AND_ID:C,AppleClang,Clang,GNU>:-Wno-unused-label>
+)
+
+if((APPLE OR CMAKE_SYSTEM_NAME STREQUAL "Linux") AND CMAKE_SYSTEM_PROCESSOR MATCHES "arm64|ARM64|aarch64")
+   target_compile_definitions(softfloat INTERFACE
+      SOFTFLOAT_DISABLE_LEGACY_TYPE_ALIASES
+   )
+
+   file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/include/softfloat")
+   configure_file(
+      "${CMAKE_CURRENT_SOURCE_DIR}/source/include/softfloat.hpp"
+      "${CMAKE_CURRENT_BINARY_DIR}/include/softfloat/softfloat.hpp"
+      COPYONLY
+   )
+   configure_file(
+      "${CMAKE_CURRENT_SOURCE_DIR}/source/include/softfloat_types.h"
+      "${CMAKE_CURRENT_BINARY_DIR}/include/softfloat_types.h"
+      COPYONLY
+   )
+   add_executable(softfloat_neon_include_order_test
+      tests/softfloat_neon_include_order_test.cpp
+      tests/softfloat_neon_include_order_reverse_test.cpp
+   )
+   target_include_directories(softfloat_neon_include_order_test PRIVATE
+      "${CMAKE_CURRENT_BINARY_DIR}/include"
+      "${CMAKE_CURRENT_SOURCE_DIR}/source/include"
+   )
+   target_link_libraries(softfloat_neon_include_order_test PRIVATE softfloat)
+endif()
 
 if(SOFTFLOAT_INSTALL_COMPONENT)
    set(INSTALL_COMPONENT_ARGS COMPONENT ${SOFTFLOAT_INSTALL_COMPONENT} EXCLUDE_FROM_ALL)

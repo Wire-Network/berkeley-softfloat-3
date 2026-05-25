@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.h"
 #include "softfloat.h"
 
-float16_t f128_to_f16( float128_t a )
+softfloat16_t f128_to_f16( softfloat128_t a )
 {
     union ui128_f128 uA;
     uint_fast64_t uiA64, uiA0;

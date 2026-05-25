@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.h"
 #include "softfloat.h"
 
-float32_t softfloat_subMagsF32( uint_fast32_t uiA, uint_fast32_t uiB )
+softfloat32_t softfloat_subMagsF32( uint_fast32_t uiA, uint_fast32_t uiB )
 {
     int_fast16_t expA;
     uint_fast32_t sigA;

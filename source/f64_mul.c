@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.h"
 #include "softfloat.h"
 
-float64_t f64_mul( float64_t a, float64_t b )
+softfloat64_t f64_mul( softfloat64_t a, softfloat64_t b )
 {
     union ui64_f64 uA;
     uint_fast64_t uiA;

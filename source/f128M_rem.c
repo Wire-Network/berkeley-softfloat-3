@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef SOFTFLOAT_FAST_INT64
 
 void
- f128M_rem( const float128_t *aPtr, const float128_t *bPtr, float128_t *zPtr )
+ f128M_rem( const softfloat128_t *aPtr, const softfloat128_t *bPtr, softfloat128_t *zPtr )
 {
 
     *zPtr = f128_rem( *aPtr, *bPtr );
@@ -54,7 +54,7 @@ void
 #else
 
 void
- f128M_rem( const float128_t *aPtr, const float128_t *bPtr, float128_t *zPtr )
+ f128M_rem( const softfloat128_t *aPtr, const softfloat128_t *bPtr, softfloat128_t *zPtr )
 {
     const uint32_t *aWPtr, *bWPtr;
     uint32_t *zWPtr, uiA96;

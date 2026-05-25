@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.h"
 #include "softfloat.h"
 
-extFloat80_t f64_to_extF80( float64_t a )
+extFloat80_t f64_to_extF80( softfloat64_t a )
 {
     union ui64_f64 uA;
     uint_fast64_t uiA;

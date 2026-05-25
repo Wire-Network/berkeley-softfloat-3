@@ -58,13 +58,13 @@ void
     bool isSigNaNB;
     uint32_t uiA96, uiB96, wordMagA, wordMagB;
 
-    isSigNaNA = f128M_isSignalingNaN( (const float128_t *) aWPtr );
+    isSigNaNA = f128M_isSignalingNaN( (const softfloat128_t *) aWPtr );
     ptr = aWPtr;
     if ( ! bWPtr ) {
         if ( isSigNaNA ) softfloat_raiseFlags( softfloat_flag_invalid );
         goto copy;
     }
-    isSigNaNB = f128M_isSignalingNaN( (const float128_t *) bWPtr );
+    isSigNaNB = f128M_isSignalingNaN( (const softfloat128_t *) bWPtr );
     if ( isSigNaNA | isSigNaNB ) {
         softfloat_raiseFlags( softfloat_flag_invalid );
         if ( isSigNaNA ) {

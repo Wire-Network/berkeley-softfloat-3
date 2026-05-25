@@ -52,7 +52,7 @@ void
  softfloat_f128MToCommonNaN( const uint32_t *aWPtr, struct commonNaN *zPtr )
 {
 
-    if ( f128M_isSignalingNaN( (const float128_t *) aWPtr ) ) {
+    if ( f128M_isSignalingNaN( (const softfloat128_t *) aWPtr ) ) {
         softfloat_raiseFlags( softfloat_flag_invalid );
     }
     zPtr->sign = aWPtr[indexWordHi( 4 )]>>31;
