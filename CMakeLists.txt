@@ -4,6 +4,7 @@ cmake_minimum_required(VERSION 3.10)
 project (SoftFloat )
 
 include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
 
 # generate compile command database for external tools
 set (CMAKE_EXPORT_COMPILE_COMMANDS "ON")
@@ -346,7 +347,7 @@ target_include_directories( softfloat PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/source/include>
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/source/${ARCH_SOURCE_TYPE}>
    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/build/${ARCH_BUILD_TYPE}>
-   $<INSTALL_INTERFACE:include/softfloat>
+   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/softfloat>
 )
 target_compile_options(softfloat PRIVATE
    $<$<COMPILE_LANG_AND_ID:C,AppleClang,Clang,GNU>:-Wno-unused-label>
@@ -383,6 +384,12 @@ if(SOFTFLOAT_INSTALL_COMPONENT)
    set(INSTALL_COMPONENT_ARGS COMPONENT ${SOFTFLOAT_INSTALL_COMPONENT} EXCLUDE_FROM_ALL)
 endif()
 
+write_basic_package_version_file(
+   "${CMAKE_CURRENT_BINARY_DIR}/softfloat-config-version.cmake"
+   VERSION 3.0.0
+   COMPATIBILITY SameMajorVersion
+)
+
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/source/include/ DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR}/softfloat ${INSTALL_COMPONENT_ARGS})
 install(TARGETS softfloat
    EXPORT softfloat-config
@@ -391,5 +398,8 @@ install(TARGETS softfloat
 install(EXPORT softfloat-config
    FILE softfloat-config.cmake
    NAMESPACE softfloat::
-   DESTINATION share/softfloat
+   DESTINATION ${CMAKE_INSTALL_DATADIR}/softfloat
+   ${INSTALL_COMPONENT_ARGS})
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/softfloat-config-version.cmake"
+   DESTINATION ${CMAKE_INSTALL_DATADIR}/softfloat
    ${INSTALL_COMPONENT_ARGS})
