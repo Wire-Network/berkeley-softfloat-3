@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 3.10)
 # Defines softfloat library
 project (SoftFloat )
 
+include(GNUInstallDirs)
+
 # generate compile command database for external tools
 set (CMAKE_EXPORT_COMPILE_COMMANDS "ON")
 
@@ -340,7 +342,12 @@ file ( GLOB softfloat_headers "${CMAKE_CURRENT_SOURCE_DIR}/source/include/*.h"
                               "${CMAKE_CURRENT_SOURCE_DIR}/source/${ARCH_SOURCE_TYPE}/specialize.h" )
 list( APPEND softfloat_sources ${softfloat_headers} )
 add_library ( softfloat STATIC ${softfloat_sources} )
-target_include_directories( softfloat PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/source/include" "${CMAKE_CURRENT_SOURCE_DIR}/source/${ARCH_SOURCE_TYPE}" "${CMAKE_CURRENT_SOURCE_DIR}/build/${ARCH_BUILD_TYPE}" )
+target_include_directories( softfloat PUBLIC
+   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/source/include>
+   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/source/${ARCH_SOURCE_TYPE}>
+   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/build/${ARCH_BUILD_TYPE}>
+   $<INSTALL_INTERFACE:include/softfloat>
+)
 target_compile_options(softfloat PRIVATE
    $<$<COMPILE_LANG_AND_ID:C,AppleClang,Clang,GNU>:-Wno-unused-label>
 )
@@ -378,5 +385,11 @@ endif()
 
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/source/include/ DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR}/softfloat ${INSTALL_COMPONENT_ARGS})
 install(TARGETS softfloat
+   EXPORT softfloat-config
    LIBRARY DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR} ${INSTALL_COMPONENT_ARGS}
    ARCHIVE DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR} ${INSTALL_COMPONENT_ARGS})
+install(EXPORT softfloat-config
+   FILE softfloat-config.cmake
+   NAMESPACE softfloat::
+   DESTINATION share/softfloat
+   ${INSTALL_COMPONENT_ARGS})
