@@ -354,10 +354,6 @@ target_compile_options(softfloat PRIVATE
 )
 
 if((APPLE OR CMAKE_SYSTEM_NAME STREQUAL "Linux") AND CMAKE_SYSTEM_PROCESSOR MATCHES "arm64|ARM64|aarch64")
-   target_compile_definitions(softfloat INTERFACE
-      SOFTFLOAT_DISABLE_LEGACY_TYPE_ALIASES
-   )
-
    file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/include/softfloat")
    configure_file(
       "${CMAKE_CURRENT_SOURCE_DIR}/source/include/softfloat.hpp"
