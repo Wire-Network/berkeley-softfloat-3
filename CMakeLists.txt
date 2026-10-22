@@ -5,6 +5,7 @@ project (SoftFloat )
 
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
+include(CTest)
 
 # generate compile command database for external tools
 set (CMAKE_EXPORT_COMPILE_COMMANDS "ON")
@@ -352,6 +353,19 @@ target_include_directories( softfloat PUBLIC
 target_compile_options(softfloat PRIVATE
    $<$<COMPILE_LANG_AND_ID:C,AppleClang,Clang,GNU>:-Wno-unused-label>
 )
+# Per-thread rounding/exception state (softfloat_state.c). PUBLIC so consumers' extern declarations
+# carry the same storage class as the definitions; C++ gets __thread because g++ rejects _Thread_local.
+target_compile_definitions(softfloat PUBLIC
+   $<$<COMPILE_LANGUAGE:C>:THREAD_LOCAL=_Thread_local>
+   $<$<COMPILE_LANGUAGE:CXX>:THREAD_LOCAL=__thread>
+)
+
+if(BUILD_TESTING)
+   find_package(Threads REQUIRED)
+   add_executable(softfloat_thread_local_state_test tests/softfloat_thread_local_state_test.cpp)
+   target_link_libraries(softfloat_thread_local_state_test PRIVATE softfloat Threads::Threads)
+   add_test(NAME softfloat_thread_local_state_test COMMAND softfloat_thread_local_state_test)
+endif()
 
 if((APPLE OR CMAKE_SYSTEM_NAME STREQUAL "Linux") AND CMAKE_SYSTEM_PROCESSOR MATCHES "arm64|ARM64|aarch64")
    file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/include/softfloat")
