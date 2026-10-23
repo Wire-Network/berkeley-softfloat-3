@@ -15,7 +15,7 @@ message ( STATUS "Configuring SoftFloat" )
 set( C_DEFINES "-DSOFTFLOAT_FAST_INT64 -DSOFTFLOAT_ROUND_EVEN -DINLINE_LEVEL=5 -DSOFTFLOAT_FAST_DIV32TO16 -DSOFTFLOAT_FAST_DIV64TO32" )
 set( CMAKE_C_FLAGS " -Wall -Werror-implicit-function-declaration -Wno-conversion ${CMAKE_C_FLAGS} ${C_DEFINES}" )
 
-if(CMAKE_SYSTEM_PROCESSOR MATCHES "wasm|wasm32|wasm64")
+if(EMSCRIPTEN OR CMAKE_SYSTEM_NAME STREQUAL "Emscripten" OR CMAKE_SYSTEM_PROCESSOR MATCHES "wasm|wasm32|wasm64")
    message(STATUS "Configuring for wasm")
    set(ARCH_SOURCE_TYPE 8086-SSE)
    set(ARCH_BUILD_TYPE Linux-x86_64-GCC)
@@ -357,7 +357,8 @@ target_compile_options(softfloat PRIVATE
 )
 # Per-thread rounding/exception state (softfloat_state.c). PUBLIC so consumers' extern declarations
 # carry the same storage class as the definitions. __thread, not C11 _Thread_local / C++11 thread_local:
-# GCC and Clang accept it in every C and C++ mode, pedantic C99 included.
+# GCC and Clang accept it in every C and C++ mode, pedantic C99 included. Chosen at configure time so the
+# exported definition needs no generator expression (CMake 3.10 consumers).
 if(SOFTFLOAT_TARGET_WASM)
    # wasm keeps TLS only with atomics and bulk memory (-pthread), and the library and its consumers must
    # agree on that; without the option the state stays plain globals, as in single-threaded wasm.
@@ -366,13 +367,10 @@ if(SOFTFLOAT_TARGET_WASM)
       target_link_libraries(softfloat INTERFACE -pthread)
       target_compile_definitions(softfloat PUBLIC THREAD_LOCAL=__thread)
    endif()
+elseif(MSVC)
+   target_compile_definitions(softfloat PUBLIC "THREAD_LOCAL=__declspec(thread)")
 else()
-   target_compile_definitions(softfloat PUBLIC
-      $<$<COMPILE_LANG_AND_ID:C,AppleClang,Clang,GNU>:THREAD_LOCAL=__thread>
-      $<$<COMPILE_LANG_AND_ID:CXX,AppleClang,Clang,GNU>:THREAD_LOCAL=__thread>
-      "$<$<COMPILE_LANG_AND_ID:C,MSVC>:THREAD_LOCAL=__declspec(thread)>"
-      "$<$<COMPILE_LANG_AND_ID:CXX,MSVC>:THREAD_LOCAL=__declspec(thread)>"
-   )
+   target_compile_definitions(softfloat PUBLIC THREAD_LOCAL=__thread)
 endif()
 
 if(BUILD_TESTING AND (NOT SOFTFLOAT_TARGET_WASM OR SOFTFLOAT_WASM_THREADS))
