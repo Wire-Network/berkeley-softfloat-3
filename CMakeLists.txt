@@ -399,6 +399,8 @@ if((APPLE OR CMAKE_SYSTEM_NAME STREQUAL "Linux") AND CMAKE_SYSTEM_PROCESSOR MATC
       tests/softfloat_neon_include_order_test.cpp
       tests/softfloat_neon_include_order_reverse_test.cpp
    )
+   # The target no longer forces this on consumers (67af45c); the test checks the opt-in.
+   target_compile_definitions(softfloat_neon_include_order_test PRIVATE SOFTFLOAT_DISABLE_LEGACY_TYPE_ALIASES)
    target_include_directories(softfloat_neon_include_order_test PRIVATE
       "${CMAKE_CURRENT_BINARY_DIR}/include"
       "${CMAKE_CURRENT_SOURCE_DIR}/source/include"
