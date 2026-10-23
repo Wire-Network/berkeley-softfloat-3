@@ -6,6 +6,7 @@ project (SoftFloat )
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 include(CTest)
+option(SOFTFLOAT_WASM_THREADS "Threaded wasm: compile and link softfloat and its consumers with -pthread" OFF)
 
 # generate compile command database for external tools
 set (CMAKE_EXPORT_COMPILE_COMMANDS "ON")
@@ -18,6 +19,7 @@ if(CMAKE_SYSTEM_PROCESSOR MATCHES "wasm|wasm32|wasm64")
    message(STATUS "Configuring for wasm")
    set(ARCH_SOURCE_TYPE 8086-SSE)
    set(ARCH_BUILD_TYPE Linux-x86_64-GCC)
+   set(SOFTFLOAT_TARGET_WASM TRUE)
 elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64|AMD64|amd64|x64")
    message(STATUS "Configuring for x86_64")
    set(ARCH_SOURCE_TYPE 8086-SSE)
@@ -354,15 +356,29 @@ target_compile_options(softfloat PRIVATE
    $<$<COMPILE_LANG_AND_ID:C,AppleClang,Clang,GNU>:-Wno-unused-label>
 )
 # Per-thread rounding/exception state (softfloat_state.c). PUBLIC so consumers' extern declarations
-# carry the same storage class as the definitions; C++ gets __thread because g++ rejects _Thread_local.
-target_compile_definitions(softfloat PUBLIC
-   $<$<COMPILE_LANGUAGE:C>:THREAD_LOCAL=_Thread_local>
-   $<$<COMPILE_LANGUAGE:CXX>:THREAD_LOCAL=__thread>
-)
+# carry the same storage class as the definitions. __thread, not C11 _Thread_local / C++11 thread_local:
+# GCC and Clang accept it in every C and C++ mode, pedantic C99 included.
+if(SOFTFLOAT_TARGET_WASM)
+   # wasm keeps TLS only with atomics and bulk memory (-pthread), and the library and its consumers must
+   # agree on that; without the option the state stays plain globals, as in single-threaded wasm.
+   if(SOFTFLOAT_WASM_THREADS)
+      target_compile_options(softfloat PUBLIC -pthread)
+      target_link_libraries(softfloat INTERFACE -pthread)
+      target_compile_definitions(softfloat PUBLIC THREAD_LOCAL=__thread)
+   endif()
+else()
+   target_compile_definitions(softfloat PUBLIC
+      $<$<COMPILE_LANG_AND_ID:C,AppleClang,Clang,GNU>:THREAD_LOCAL=__thread>
+      $<$<COMPILE_LANG_AND_ID:CXX,AppleClang,Clang,GNU>:THREAD_LOCAL=__thread>
+      "$<$<COMPILE_LANG_AND_ID:C,MSVC>:THREAD_LOCAL=__declspec(thread)>"
+      "$<$<COMPILE_LANG_AND_ID:CXX,MSVC>:THREAD_LOCAL=__declspec(thread)>"
+   )
+endif()
 
-if(BUILD_TESTING)
+if(BUILD_TESTING AND (NOT SOFTFLOAT_TARGET_WASM OR SOFTFLOAT_WASM_THREADS))
    find_package(Threads REQUIRED)
    add_executable(softfloat_thread_local_state_test tests/softfloat_thread_local_state_test.cpp)
+   target_compile_features(softfloat_thread_local_state_test PRIVATE cxx_std_11)
    target_link_libraries(softfloat_thread_local_state_test PRIVATE softfloat Threads::Threads)
    add_test(NAME softfloat_thread_local_state_test COMMAND softfloat_thread_local_state_test)
 endif()
