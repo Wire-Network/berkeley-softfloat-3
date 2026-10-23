@@ -5,6 +5,8 @@ project (SoftFloat )
 
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
+include(CTest)
+option(SOFTFLOAT_WASM_THREADS "Threaded wasm: compile and link softfloat and its consumers with -pthread" OFF)
 
 # generate compile command database for external tools
 set (CMAKE_EXPORT_COMPILE_COMMANDS "ON")
@@ -13,10 +15,11 @@ message ( STATUS "Configuring SoftFloat" )
 set( C_DEFINES "-DSOFTFLOAT_FAST_INT64 -DSOFTFLOAT_ROUND_EVEN -DINLINE_LEVEL=5 -DSOFTFLOAT_FAST_DIV32TO16 -DSOFTFLOAT_FAST_DIV64TO32" )
 set( CMAKE_C_FLAGS " -Wall -Werror-implicit-function-declaration -Wno-conversion ${CMAKE_C_FLAGS} ${C_DEFINES}" )
 
-if(CMAKE_SYSTEM_PROCESSOR MATCHES "wasm|wasm32|wasm64")
+if(EMSCRIPTEN OR CMAKE_SYSTEM_NAME STREQUAL "Emscripten" OR CMAKE_SYSTEM_PROCESSOR MATCHES "wasm|wasm32|wasm64")
    message(STATUS "Configuring for wasm")
    set(ARCH_SOURCE_TYPE 8086-SSE)
    set(ARCH_BUILD_TYPE Linux-x86_64-GCC)
+   set(SOFTFLOAT_TARGET_WASM TRUE)
 elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64|AMD64|amd64|x64")
    message(STATUS "Configuring for x86_64")
    set(ARCH_SOURCE_TYPE 8086-SSE)
@@ -352,6 +355,31 @@ target_include_directories( softfloat PUBLIC
 target_compile_options(softfloat PRIVATE
    $<$<COMPILE_LANG_AND_ID:C,AppleClang,Clang,GNU>:-Wno-unused-label>
 )
+# Per-thread rounding/exception state (softfloat_state.c). PUBLIC so consumers' extern declarations
+# carry the same storage class as the definitions. __thread, not C11 _Thread_local / C++11 thread_local:
+# GCC and Clang accept it in every C and C++ mode, pedantic C99 included. Chosen at configure time so the
+# exported definition needs no generator expression (CMake 3.10 consumers).
+if(SOFTFLOAT_TARGET_WASM)
+   # wasm keeps TLS only with atomics and bulk memory (-pthread), and the library and its consumers must
+   # agree on that; without the option the state stays plain globals, as in single-threaded wasm.
+   if(SOFTFLOAT_WASM_THREADS)
+      target_compile_options(softfloat PUBLIC -pthread)
+      target_link_libraries(softfloat INTERFACE -pthread)
+      target_compile_definitions(softfloat PUBLIC THREAD_LOCAL=__thread)
+   endif()
+elseif(MSVC)
+   target_compile_definitions(softfloat PUBLIC "THREAD_LOCAL=__declspec(thread)")
+else()
+   target_compile_definitions(softfloat PUBLIC THREAD_LOCAL=__thread)
+endif()
+
+if(BUILD_TESTING AND (NOT SOFTFLOAT_TARGET_WASM OR SOFTFLOAT_WASM_THREADS))
+   find_package(Threads REQUIRED)
+   add_executable(softfloat_thread_local_state_test tests/softfloat_thread_local_state_test.cpp)
+   target_compile_features(softfloat_thread_local_state_test PRIVATE cxx_std_11)
+   target_link_libraries(softfloat_thread_local_state_test PRIVATE softfloat Threads::Threads)
+   add_test(NAME softfloat_thread_local_state_test COMMAND softfloat_thread_local_state_test)
+endif()
 
 if((APPLE OR CMAKE_SYSTEM_NAME STREQUAL "Linux") AND CMAKE_SYSTEM_PROCESSOR MATCHES "arm64|ARM64|aarch64")
    file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/include/softfloat")
@@ -369,6 +397,8 @@ if((APPLE OR CMAKE_SYSTEM_NAME STREQUAL "Linux") AND CMAKE_SYSTEM_PROCESSOR MATC
       tests/softfloat_neon_include_order_test.cpp
       tests/softfloat_neon_include_order_reverse_test.cpp
    )
+   # The target no longer forces this on consumers (67af45c); the test checks the opt-in.
+   target_compile_definitions(softfloat_neon_include_order_test PRIVATE SOFTFLOAT_DISABLE_LEGACY_TYPE_ALIASES)
    target_include_directories(softfloat_neon_include_order_test PRIVATE
       "${CMAKE_CURRENT_BINARY_DIR}/include"
       "${CMAKE_CURRENT_SOURCE_DIR}/source/include"
